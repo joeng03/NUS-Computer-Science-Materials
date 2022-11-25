@@ -1,0 +1,38 @@
+###     Chapter 3 Radiant codes
+
+##      Video: (Radiant) Unit 0 Data Preparation
+age = year(month) - lease_commence_date
+
+##      Video: (Radiant) Unit 1A (Histogram)
+# specifying bin width
+jan21tojun21 %>%
+ggplot(aes(x=age)) +
+geom_histogram(breaks = seq(0,54,by=2))
+
+# fill & outline bars with color
+jan21tojun21 %>%
+ggplot(aes(x=age)) +
+geom_histogram(breaks = seq(0,54,by=2), fill="orange", color="blue") +
+ggtitle("Age of HDB flats sold in Jan to Jun 2021") +
+xlab("Age") +
+ylab("NUmber of flats sold")
+
+# make plot interactive
+p =
+jan21tojun21 %>%
+ggplot(aes(x=age)) +
+geom_histogram(breaks = seq(0,54,by=2), fill="orange", color="blue") +
+ggtitle("Age of HDB flats sold in Jan to Jun 2021") +
+xlab("Age") +
+ylab("NUmber of flats sold")
+
+ggplotly(p) %>% render()
+
+##      Video: (Radiant) Unit 1B (More Histograms)
+examgrades %>%
+ggplot(aes(x=Final_Grade)) +
+geom_histogram(breaks = seq(40,100,by=20), fill="orange", color=","blue")
+
+##      Video: (Radiant) Unit 1B (Summary Statistics)
+period   = cut(month, "6 months", labels = c("2020H1","2020H2","2021H1"))
+quarters = cut(month, "3 months", labels = c("2020Q1","2020Q2","2020Q3","2020Q4","2021Q1","2021Q2"))

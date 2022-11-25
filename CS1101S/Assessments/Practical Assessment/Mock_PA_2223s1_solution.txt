@@ -1,0 +1,188 @@
+﻿//=====================================================================
+// TASK 1A
+function is_pa_word(s) {
+    return !is_null(member(s, pa_words));
+}
+
+// Alternative solution
+function is_pa_word(s) {
+    return !is_null(filter(x => x === s, pa_words));
+}
+
+// Alternative solution
+function is_pa_word(s) {
+    return accumulate((x, y) => (x === s) || y, false, pa_words);
+}
+
+// Alternative solution
+function is_pa_word(s) {
+    function iter(xs) {
+        return is_null(xs) ? false : s === head(xs) ? true : iter(tail(xs));
+    }
+    return iter(pa_words);
+}
+
+
+//=====================================================================
+// TASK 1B
+function count_matches(char, pos) {
+    return length(filter(x => char_at(x, pos) === char, pa_words));
+}
+
+
+//=====================================================================
+// TASK 1C
+function helper(s, i) {
+    const c = char_at(s, i);
+    return is_undefined(c)
+           ? null
+           : pair(c, () => helper(s, i + 1));
+}
+
+function char_stream(s) {
+    return helper(s, 0);
+}
+
+
+//=====================================================================
+// TASK 1D
+function solve(n, constraints) {
+    return accumulate((constraint, ss) =>
+                            filter(s => char_at(s, head(constraint))
+                                        === tail(constraint), ss),
+                      filter(s => string_length(s) === n, pa_words),
+                      constraints);
+}
+
+// Alternative solution (less efficient)
+function solve(n, constraints) {
+    function good_word(w, constraints) {
+        return accumulate((c, good) => char_at(w, head(c)) === tail(c) ? good : false,
+                          true,
+                          constraints);
+    }
+    const pa_words_len_n = filter(s => string_length(s) === n, pa_words);
+    return filter(w => good_word(w, constraints), pa_words_len_n);
+}
+
+
+//=====================================================================
+
+
+//=====================================================================
+// TASK 2A
+function eval_poly(poly) {
+    function p(x) {
+        return accumulate(
+                (t, sum) => head(t) * math_pow(x, tail(t)) + sum,
+                0,
+                poly);
+    }
+    return p;
+}
+
+// Alternative solution (using Horner's scheme)
+function eval_poly(poly) {
+
+    function horner(poly, x, exp, acc) {
+        return exp < 0
+               ? acc
+               : tail(head(poly)) < exp
+                 ? horner(poly, x, exp - 1, acc * x)
+                 : horner(tail(poly), x, exp - 1, head(head(poly)) + acc * x);
+    }
+
+    if (is_null(poly)) {
+        return x => 0;
+    } else {
+        const rev_poly = reverse(poly);
+        return x => horner(rev_poly, x, tail(head(rev_poly)), 0);
+    }
+}
+
+
+//=====================================================================
+// TASK 2B
+function add_poly(poly1, poly2) {
+    if (is_null(poly1)) {
+        return poly2;
+    } else if (is_null(poly2)) {
+        return poly1;
+    } else {
+        const coeff1 = head(head(poly1));
+        const coeff2 = head(head(poly2));
+        const exp1 = tail(head(poly1));
+        const exp2 = tail(head(poly2));
+
+        if (exp1 === exp2) {
+            return coeff1 + coeff2 === 0
+                ? add_poly(tail(poly1), tail(poly2))
+                : pair(pair(coeff1 + coeff2, exp1),
+                       add_poly(tail(poly1), tail(poly2)));
+        } else if (exp1 < exp2) {
+            return pair(head(poly1), add_poly(tail(poly1), poly2));
+        } else {
+            return pair(head(poly2), add_poly(poly1, tail(poly2)));
+        }
+    }
+}
+
+
+//=====================================================================
+// TASK 2C
+function multiply_poly(poly1, poly2) {
+    const coeff = head;
+    const exp = tail;
+    return accumulate((term1, acc) =>
+                         add_poly(map(term2 =>
+                                        pair(coeff(term1) * coeff(term2),
+                                             exp(term1) + exp(term2)),
+                                      poly2),
+                                  acc),
+                      null,
+                      poly1);
+}
+
+// Alternative solution
+function multiply_poly(poly1, poly2) {
+    return accumulate((p, q) => add_poly(p, q),
+                      null,
+                      map(t1 => map(t2 => pair(head(t1) * head(t2),
+                                              tail(t1) + tail(t2)),
+                                    poly2),
+                          poly1));
+}
+
+
+//=====================================================================
+
+
+//=====================================================================
+// TASK 3
+function alt_column_matrix(R, C) {
+    const M = [];
+
+    for (let r = 0; r < R; r = r + 1) {
+        M[r] = [];
+    }
+
+    let count = 1;
+
+    for (let c = 0; c < C; c = c + 1) {
+        if (c % 2 === 0) {
+            for (let r = 0; r < R; r = r + 1) {
+                M[r][c] = count;
+                count = count + 1;
+            }
+        } else {
+            for (let r = R - 1; r >= 0; r = r - 1) {
+                M[r][c] = count;
+                count = count + 1;
+            }
+        }
+    }
+
+    return M;
+}
+
+//=====================================================================

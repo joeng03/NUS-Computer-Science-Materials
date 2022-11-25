@@ -1,0 +1,13 @@
+###     Chapter 1 Radiant codes
+
+##      Video: (Radiant) Unit 3F (Dotplot)
+
+#   make a dotplot with default settings
+SchoolB %>%
+    ggplot(aes(x=Total)) +
+    geom_dotplot()
+
+#   make a dotplot with binwidth=1
+SchoolB %>%
+    ggplot(aes(x=Total)) +
+    geom_dotplot(binwidth=1)
